@@ -12,6 +12,20 @@ SecureOps is a cybersecurity incident and vulnerability management platform. Sec
 - Responsive dark dashboard layout.
 - No demo records or simulated success responses: successful responses follow real writes to the active storage backend.
 
+  ## ## AI-Assisted Development
+
+**Tools used:** Replit Agent and ChatGPT for development guidance, troubleshooting, and documentation. Kiro was considered during the development process, but Replit was used as the primary online development environment.
+
+### AI-assisted tasks
+
+1. **Project structure:** Assisted with organizing the React frontend, Express API server, and shared API definitions.
+2. **Incident management:** Assisted with implementing API workflows for creating, viewing, updating, and deleting security incidents.
+3. **Vulnerability management:** Assisted with implementing vulnerability tracking, severity information, status updates, and affected-asset details.
+4. **Validation and error handling:** Assisted with reviewing API request validation and error responses.
+5. **Troubleshooting and documentation:** Assisted with investigating development and database connectivity issues and preparing the project README.
+
+AI-generated suggestions were reviewed during development. Database connectivity and deployment should be verified independently before the application is used in production.
+
 ## Installation and setup
 
 ### Requirements
