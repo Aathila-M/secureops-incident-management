@@ -55,3 +55,8 @@ Thumbs.db
 
 # Persistent local SecureOps data (runtime-created, never commit)
 artifacts/api-server/data/
+
+# Additional sensitive files and logs
+*.pem
+*.key
+*.log
