@@ -85,6 +85,15 @@ Express 5 API (artifacts/api-server)
 > **Vulnerability-management screenshot placeholder:** Add a capture of the vulnerability list and detail workflow here.
 > <img width="1101" height="557" alt="Screenshot 2026-10-10 170750" src="https://github.com/user-attachments/assets/7d3ff58e-9ff4-4db9-9329-8ca029b01945" />
 
+## Verification Results
+
+- The SecureOps dashboard, incident list, and vulnerability list load in the Replit preview.
+- The API health endpoint responds successfully.
+- The health check currently reports `storageMode: "local-json"` and `mongodbConnected: false`.
+- MongoDB Atlas connection attempts currently fail with a TLS handshake error. The application uses persistent local JSON fallback storage while Atlas is unavailable.
+- Browser-refresh persistence was observed for the displayed records. MongoDB Atlas persistence remains unverified.
+
+
 
 ## Testing
 
@@ -137,10 +146,4 @@ Delete the temporary incident with `curl -i -X DELETE http://localhost:80/api/in
 - `lib/api-spec/openapi.yaml` — API contract.
 - `lib/api-zod/` and `lib/api-client-react/` — generated API validation and client code.
 
- ### Verification Results
-
-- The SecureOps dashboard, incident list, and vulnerability list load in the Replit preview.
-- The API health endpoint responds successfully.
-- The health check currently reports `storageMode: "local-json"` and `mongodbConnected: false`.
-- MongoDB Atlas connection attempts currently fail with a TLS handshake error. The application uses persistent local JSON fallback storage while Atlas is unavailable.
-- Browser-refresh persistence was observed for the displayed records. MongoDB Atlas persistence remains unverified.
+ 
