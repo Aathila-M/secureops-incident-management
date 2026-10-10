@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
@@ -30,5 +30,32 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+app.use(
+  (
+    error: unknown,
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): void => {
+    const status =
+      typeof error === "object" && error !== null && "status" in error
+        ? Number(error.status)
+        : 500;
+    if (status === 400) {
+      res.status(400).json({ error: "Request body must contain valid JSON." });
+      return;
+    }
+    if (status === 413) {
+      res.status(413).json({ error: "Request body is too large." });
+      return;
+    }
+    req.log.error(
+      { errorName: error instanceof Error ? error.name : "UnknownError" },
+      "Unhandled API request error",
+    );
+    res.status(500).json({ error: "The request could not be completed." });
+  },
+);
 
 export default app;

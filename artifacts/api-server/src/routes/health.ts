@@ -1,11 +1,21 @@
-import { Router, type IRouter } from "express";
+import {
+  Router,
+  type IRouter,
+  type Request,
+  type Response,
+} from "express";
 import { HealthCheckResponse } from "@workspace/api-zod";
+import { getStorageHealth } from "../lib/storage-mode";
 
 const router: IRouter = Router();
 
-router.get("/healthz", (_req, res) => {
-  const data = HealthCheckResponse.parse({ status: "ok" });
-  res.json(data);
-});
+function reportHealth(_req: Request, res: Response): void {
+  const health = getStorageHealth();
+  const body = HealthCheckResponse.parse(health);
+  res.status(health.status === "unavailable" ? 503 : 200).json(body);
+}
+
+router.get("/health", reportHealth);
+router.get("/healthz", reportHealth);
 
 export default router;

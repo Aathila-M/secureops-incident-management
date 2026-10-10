@@ -3,3 +3,9 @@
 
 # No need to store the pnpm store twice.
 .local
+
+# Never bundle local credentials or development-only records.
+.env
+.env.*
+!.env.example
+artifacts/api-server/data/

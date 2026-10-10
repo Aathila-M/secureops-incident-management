@@ -47,3 +47,11 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Credentials and environment-specific settings
+.env
+.env.*
+!.env.example
+
+# Persistent local SecureOps data (runtime-created, never commit)
+artifacts/api-server/data/

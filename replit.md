@@ -1,44 +1,55 @@
-# [Project name]
+# SecureOps
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Cybersecurity incident and vulnerability management with a React dashboard, Express API, and MongoDB Atlas persistence.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the shared Express API server
+- `pnpm --filter @workspace/secureops run dev` — run the SecureOps web app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Optional secret: `MONGODB_URI` — MongoDB Atlas connection URI; local JSON storage remains available when it is absent or unreachable
+- Optional env: `MONGODB_DATABASE` — database name (defaults to `secureops`)
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
 - API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
+- DB: MongoDB Atlas + official MongoDB Node.js driver, with a persistent local JSON fallback
+- Validation: Zod (generated from the OpenAPI contract)
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/secureops/src/` — React pages, components, and theme
+- `artifacts/api-server/src/routes/` — Express API endpoints
+- `artifacts/api-server/src/lib/mongo.ts` — MongoDB connection and collection types
+- `lib/api-spec/openapi.yaml` — API source of truth
+- `lib/api-client-react/` and `lib/api-zod/` — generated client hooks and validation schemas
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Atlas is accessed only from the API server; the browser never receives the database URI.
+- The API reports the active storage mode at `/api/health` and uses `artifacts/api-server/data/secureops.json` when Atlas is unavailable.
+- Local JSON records are private, excluded from Git/deployment bundles, and survive API server restarts.
+- Collections are created by MongoDB on first write; there is no startup seeding or fake demo data.
+- The generated OpenAPI client and Zod schemas are shared by the frontend and backend.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Users can review incident and vulnerability summaries, search and filter records, and create, inspect, update, and delete either record type.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Keep the dashboard dark navy and responsive.
+- Report the active backend honestly; do not show fake success messages or seed mock records.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Configure `MONGODB_URI` as a Replit Secret to use Atlas; local JSON storage handles data requests when Atlas is unavailable.
+- After changing the OpenAPI contract, run API code generation before updating hooks or route validation.
 
 ## Pointers
 

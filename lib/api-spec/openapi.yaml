@@ -10,27 +10,409 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Dashboard summaries
+  - name: incidents
+    description: Cybersecurity incident management
+  - name: vulnerabilities
+    description: Vulnerability management
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
-      summary: Health check
-      description: Returns server health status
+      summary: Health check with active storage mode
+      description: Reports API health, MongoDB connectivity, and the selected persistent storage backend
       responses:
         "200":
-          description: Healthy
+          description: MongoDB or persistent local fallback is available
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+        "503":
+          description: Neither MongoDB nor local JSON storage is available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /health:
+    get:
+      operationId: getHealth
+      tags: [health]
+      summary: Get storage-aware health status
+      description: Reports the active storage mode without exposing connection credentials
+      responses:
+        "200":
+          description: MongoDB or persistent local fallback is available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+        "503":
+          description: Neither MongoDB nor local JSON storage is available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get incident and vulnerability dashboard totals
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /incidents:
+    get:
+      operationId: listIncidents
+      tags: [incidents]
+      summary: Search and filter incidents
+      parameters:
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: severity
+          schema: { $ref: "#/components/schemas/Severity" }
+        - in: query
+          name: status
+          schema: { $ref: "#/components/schemas/IncidentStatus" }
+      responses:
+        "200":
+          description: Matching incidents
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Incident" }
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+    post:
+      operationId: createIncident
+      tags: [incidents]
+      summary: Create an incident
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/IncidentInput" }
+      responses:
+        "201":
+          description: Incident created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Incident" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /incidents/{incidentId}:
+    parameters:
+      - in: path
+        name: incidentId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getIncident
+      tags: [incidents]
+      summary: Get an incident
+      responses:
+        "200":
+          description: Incident details
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Incident" }
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+    patch:
+      operationId: updateIncident
+      tags: [incidents]
+      summary: Update an incident
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/IncidentUpdate" }
+      responses:
+        "200":
+          description: Updated incident
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Incident" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+    delete:
+      operationId: deleteIncident
+      tags: [incidents]
+      summary: Delete an incident
+      responses:
+        "200":
+          description: Deletion confirmation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeleteResult" }
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /vulnerabilities:
+    get:
+      operationId: listVulnerabilities
+      tags: [vulnerabilities]
+      summary: Search and filter vulnerabilities
+      parameters:
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: severity
+          schema: { $ref: "#/components/schemas/Severity" }
+        - in: query
+          name: status
+          schema: { $ref: "#/components/schemas/VulnerabilityStatus" }
+      responses:
+        "200":
+          description: Matching vulnerabilities
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Vulnerability" }
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+    post:
+      operationId: createVulnerability
+      tags: [vulnerabilities]
+      summary: Create a vulnerability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VulnerabilityInput" }
+      responses:
+        "201":
+          description: Vulnerability created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Vulnerability" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /vulnerabilities/{vulnerabilityId}:
+    parameters:
+      - in: path
+        name: vulnerabilityId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getVulnerability
+      tags: [vulnerabilities]
+      summary: Get a vulnerability
+      responses:
+        "200":
+          description: Vulnerability details
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Vulnerability" }
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+    patch:
+      operationId: updateVulnerability
+      tags: [vulnerabilities]
+      summary: Update a vulnerability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VulnerabilityUpdate" }
+      responses:
+        "200":
+          description: Updated vulnerability
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Vulnerability" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+    delete:
+      operationId: deleteVulnerability
+      tags: [vulnerabilities]
+      summary: Delete a vulnerability
+      responses:
+        "200":
+          description: Deletion confirmation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeleteResult" }
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 components:
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+    NotFound:
+      description: Record not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
+    ServiceUnavailable:
+      description: Database is not configured or unavailable
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiError" }
   schemas:
     HealthStatus:
       type: object
+      required:
+        - status
+        - storageMode
+        - mongodbConfigured
+        - mongodbConnected
+        - localFallbackActive
+        - message
       properties:
         status:
           type: string
-      required:
-        - status
+          enum: [ok, degraded, unavailable]
+        storageMode:
+          type: string
+          enum: [mongodb, local-json, unavailable]
+        mongodbConfigured:
+          type: boolean
+        mongodbConnected:
+          type: boolean
+        localFallbackActive:
+          type: boolean
+        message:
+          type: string
+    Severity:
+      type: string
+      enum: [Critical, High, Medium, Low]
+    IncidentStatus:
+      type: string
+      enum: [Open, Investigating, Contained, Resolved, Closed]
+    VulnerabilityStatus:
+      type: string
+      enum: [Open, In Progress, Mitigated, Accepted]
+    Incident:
+      type: object
+      required: [id, title, description, severity, status, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        severity: { $ref: "#/components/schemas/Severity" }
+        status: { $ref: "#/components/schemas/IncidentStatus" }
+        affectedAsset: { type: ["string", "null"] }
+        assignee: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    IncidentInput:
+      type: object
+      required: [title, description, severity]
+      properties:
+        title: { type: string, minLength: 3, maxLength: 120 }
+        description: { type: string, minLength: 10, maxLength: 5000 }
+        severity: { $ref: "#/components/schemas/Severity" }
+        status: { $ref: "#/components/schemas/IncidentStatus" }
+        affectedAsset: { type: string, maxLength: 160 }
+        assignee: { type: string, maxLength: 120 }
+    IncidentUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        title: { type: string, minLength: 3, maxLength: 120 }
+        description: { type: string, minLength: 10, maxLength: 5000 }
+        severity: { $ref: "#/components/schemas/Severity" }
+        status: { $ref: "#/components/schemas/IncidentStatus" }
+        affectedAsset: { type: ["string", "null"], maxLength: 160 }
+        assignee: { type: ["string", "null"], maxLength: 120 }
+    Vulnerability:
+      type: object
+      required: [id, title, affectedAsset, description, severity, status, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        affectedAsset: { type: string }
+        description: { type: string }
+        severity: { $ref: "#/components/schemas/Severity" }
+        status: { $ref: "#/components/schemas/VulnerabilityStatus" }
+        cveId: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    VulnerabilityInput:
+      type: object
+      required: [title, affectedAsset, description, severity]
+      properties:
+        title: { type: string, minLength: 3, maxLength: 120 }
+        affectedAsset: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, minLength: 10, maxLength: 5000 }
+        severity: { $ref: "#/components/schemas/Severity" }
+        status: { $ref: "#/components/schemas/VulnerabilityStatus" }
+        cveId: { type: string, maxLength: 32 }
+    VulnerabilityUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        title: { type: string, minLength: 3, maxLength: 120 }
+        affectedAsset: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, minLength: 10, maxLength: 5000 }
+        severity: { $ref: "#/components/schemas/Severity" }
+        status: { $ref: "#/components/schemas/VulnerabilityStatus" }
+        cveId: { type: ["string", "null"], maxLength: 32 }
+    DashboardSummary:
+      type: object
+      required: [totalIncidents, openIncidents, criticalIncidents, totalVulnerabilities, openVulnerabilities, incidentsBySeverity, vulnerabilitiesBySeverity]
+      properties:
+        totalIncidents: { type: integer }
+        openIncidents: { type: integer }
+        criticalIncidents: { type: integer }
+        totalVulnerabilities: { type: integer }
+        openVulnerabilities: { type: integer }
+        incidentsBySeverity:
+          type: array
+          items: { $ref: "#/components/schemas/SeverityCount" }
+        vulnerabilitiesBySeverity:
+          type: array
+          items: { $ref: "#/components/schemas/SeverityCount" }
+    SeverityCount:
+      type: object
+      required: [severity, count]
+      properties:
+        severity: { $ref: "#/components/schemas/Severity" }
+        count: { type: integer }
+    DeleteResult:
+      type: object
+      required: [deleted]
+      properties:
+        deleted: { type: boolean }
+    ApiError:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
 
