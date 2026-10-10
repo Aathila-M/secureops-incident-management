@@ -75,10 +75,16 @@ Express 5 API (artifacts/api-server)
 ## Screenshots
 
 > **Dashboard screenshot placeholder:** Add a capture of the SecureOps overview here.
+<img width="1098" height="592" alt="Screenshot 2026-10-10 170705" src="https://github.com/user-attachments/assets/076f985f-a503-495e-82fa-68fbd358a68c" />
+<img width="1114" height="577" alt="Screenshot 2026-10-10 170717" src="https://github.com/user-attachments/assets/90d30a6b-32e2-46b5-92a3-334f667fba11" />
 
 > **Incident-management screenshot placeholder:** Add a capture of the incident list and detail workflow here.
+> <img width="1092" height="566" alt="Screenshot 2026-10-10 170737" src="https://github.com/user-attachments/assets/4b37356b-8718-4d25-bce2-c88199cd8994" />
+
 
 > **Vulnerability-management screenshot placeholder:** Add a capture of the vulnerability list and detail workflow here.
+> <img width="1101" height="557" alt="Screenshot 2026-10-10 170750" src="https://github.com/user-attachments/assets/7d3ff58e-9ff4-4db9-9329-8ca029b01945" />
+
 
 ## Testing
 
