@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "SecureOps"
+description = "A cybersecurity incident and vulnerability management platform for security teams to track operational risk, manage incidents, and remediate exposed assets."
+version = "1.0.0"
+id = "artifacts/secureops"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24254
+
+[services.development]
+run = "pnpm --filter @workspace/secureops run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/secureops", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/secureops/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24254"
+BASE_PATH = "/"
